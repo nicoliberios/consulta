@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitops-app
+  namespace: argocd # Namespace donde ArgoCD está instalado
+spec:
+  project: default # Proyecto de ArgoCD
+  source:
+    repoURL: "https://github.com/freddyelgato/GitOps" # URL del repositorio Git
+    targetRevision: HEAD # Puedes especificar una rama, un tag, o un commit en vez de HEAD
+    path: manifests # Asegúrate de que la ruta en el repositorio sea correcta (corrige si es "mainfests")
+  destination:
+    server: "https://kubernetes.default.svc" # Apunta al clúster Kubernetes predeterminado
+    namespace: default # Namespace de destino donde se desplegarán las aplicaciones
+  syncPolicy:
+    automated:
+      prune: true # Permite que los recursos obsoletos sean eliminados automáticamente
+      selfHeal: true # ArgoCD intentará arreglar el estado del clúster si algo se desvía
+    syncOptions:
+      - CreateNamespace=true # Crea el namespace si no existe (opcional)
+  revisionHistoryLimit: 5 # Número de revisiones que ArgoCD mantendrá para el historial de sincronización

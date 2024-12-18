@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitops-app
+  labels:
+    app: gitops-app
+spec:
+  replicas: 3 # Puedes ajustar el número de réplicas según sea necesario
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: gitops-app
+  template:
+    metadata:
+      labels:
+        app: gitops-app
+    spec:
+      containers:
+        - name: gitops-container
+          image: 2424833f/gitopsdocker:latest # Imagen de tu Docker Hub
+          ports:
+            - containerPort: 80 # Puerto en el contenedor
+          env:
+            - name: PORT
+              value: "80" # Puerto utilizado por tu aplicación
+          resources:
+            requests:
+              memory: "128Mi" # Memoria solicitada
+              cpu: "250m" # CPU solicitado
+            limits:
+              memory: "256Mi" # Memoria máxima
+              cpu: "500m" # CPU máximo
+          livenessProbe:
+            httpGet:
+              path: /healthz # Ruta para verificar el estado de la aplicación
+              port: 80
+            initialDelaySeconds: 10 # Tiempo antes de realizar la primera comprobación
+            periodSeconds: 30 # Frecuencia de las comprobaciones
+          readinessProbe:
+            httpGet:
+              path: /readiness # Ruta para verificar si la aplicación está lista para recibir tráfico
+              port: 80
+            initialDelaySeconds: 5 # Tiempo antes de realizar la primera comprobación
+            periodSeconds: 30 # Frecuencia de las comprobaciones
+      tolerations:
+        - key: "key1" # Clave de la tolerancia
+          operator: "Equal"
+          value: "value1"
+          effect: "NoSchedule" # Permite que este pod se ejecute en nodos con taints específicos

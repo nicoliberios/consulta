@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitops-service
+spec:
+  selector:
+    app: gitops-app # Se seleccionan los pods que tengan esta etiqueta
+  ports:
+    - protocol: TCP
+      port: 80 # Puerto que expone el servicio
+      targetPort: 80 # Puerto al que se conecta dentro del contenedor
+  type: LoadBalancer # O puedes cambiarlo a 'ClusterIP' si no necesitas un LoadBalancer
+  sessionAffinity: None # O 'ClientIP' si necesitas mantener la afinidad de sesión
+  loadBalancerIP: <external-ip> # Solo si deseas especificar una IP externa estática para el LoadBalancer
+  externalTrafficPolicy: Local # Si deseas que el tráfico llegue solo a los pods en el nodo de origen
